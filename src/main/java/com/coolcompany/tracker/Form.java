@@ -19,8 +19,17 @@ public abstract class Form extends JFrame {
     protected Frame windowFrame;
     protected boolean isChild;
 
-    public Form(boolean isChild) { 
+    public Form() {
+        this(false, "Window");
+    }
+
+    public Form(boolean isChild) {
+        this(isChild, "Window");
+    }
+
+    public Form(boolean isChild, String title) { 
         this.isChild = isChild;
+        this.setTitle(title);
     }
 
     public abstract void run();

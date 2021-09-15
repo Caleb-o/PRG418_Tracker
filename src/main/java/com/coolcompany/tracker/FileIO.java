@@ -1,44 +1,62 @@
 package com.coolcompany.tracker;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
-public class FileIO {
+public final class FileIO {
 
     /**
-     *
-     * @param name is the name of the person/s being searched for
-     * @return a List of PersonDTO for each matching person OR NULL if not found
+     * @return a List of PersonData from file
      */
-    public List<PersonDTO> read(final String name) {
+    public static List<PersonData> read() {
 
-        if (name.equals("bob")) {
-            return null;
+        List<PersonData> pdata = new ArrayList<PersonData>();
+
+        // Try to read the file as persondata
+        try {
+            File file = new File("friend_data.csv");
+            Scanner reader = new Scanner(file);
+
+            // Read each line
+            while(reader.hasNextLine()) {
+                pdata.add(new PersonData(reader.nextLine().split(",")));
+            }
+            reader.close();
+
+        } catch (IOException e) {
+            System.out.println("Could not read file: \"friend_data.csv\".");
+            return new ArrayList<PersonData>();
         }
-
-        // this should go to the CSV and find something
-        // for now just return a List with a single PersonDTO
-        PersonDTO person = new PersonDTO();
-        person.setName(name);
-        person.setLikes("Java");
-        person.setDislikes("csharp");
-
-        return Arrays.asList(person);
+        return pdata;
     }
 
     /**
-     * Create a new Person record in the MyFriednData.csv
+     * Create a new Person record in the friend_data.csv
      * @param person
      */
-    public void create(final PersonDTO person) {
+    public static void create(final PersonData person) {
+        try {
+            FileWriter writer = new FileWriter("friend_data.csv", true);
+            writer.write(person.getCSVData());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Could not write to file: \"friend_data.csv\".");
+        }
     }
 
-    public void update(final PersonDTO person) {
-
+    public static void update(final List<PersonData> personData) {
+        try {
+            FileWriter writer = new FileWriter("friend_data.csv");
+            for(PersonData person : personData) {
+                writer.write(person.getCSVData());
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Could not write to file: \"friend_data.csv\".");
+        }
     }
-
-    public void delete(final PersonDTO person) {
-
-    }
-
 }

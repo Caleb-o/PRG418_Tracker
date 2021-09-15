@@ -1,20 +1,25 @@
 package com.coolcompany.tracker;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Tracker extends Form {
-    private FileIO fileIO = new FileIO();
-
     private JButton btnFind, btnNew, btnSave, btnDelete;
     private JButton btnBinarySearch, btnBirthdayInMonth;
     private JButton btnForward, btnFastForward, btnBack, btnRewind;
-    private JTextField textFieldFind;
-    private JTextArea largeTextArea;
 
-    public Tracker(boolean isChild) {
-        super(isChild);
+    private JTextField textFieldFind;
+    private JTextArea viewTextArea;
+
+    private List<PersonData> pdata;
+
+
+    public Tracker(String title) {
+        super(false, title);
     }
 
     public void run() {
@@ -30,13 +35,16 @@ public class Tracker extends Form {
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
 
-        // add GUI objects
-        addBirthdayTrackerTitleLabel();
+        // Load all data
+        pdata = FileIO.read();
 
-        addFindLabel();
-        addFindTextField();
-        addFindButton();
-        addLargeTextArea();
+        // add GUI objects
+        addTitleLabel();
+
+        addLabels();
+        addTextFields();
+        addButtons();
+        addTextArea();
 
         // apply layout to Form
         Container contentPane = this.getContentPane();
@@ -58,24 +66,26 @@ public class Tracker extends Form {
         this.setVisible(true);
     }
 
-    private void addBirthdayTrackerTitleLabel() {
+    private void addTitleLabel() {
         JLabel label = UIComponentLibrary.createJLabel(
-                "Birthday Tracker",
-                WINDOW_COLUMN_ONE_X,
-                10,
-                this,
-                layout);
+            "Birthday Tracker",
+            WINDOW_COLUMN_ONE_X,
+            10,
+            this,
+            layout
+        );
         label.setFont(new Font(label.getName(), Font.BOLD, 15));
         label.setForeground(Color.BLACK);
     }
 
-    private void addFindLabel() {
+    private void addLabels() {
         JLabel label = UIComponentLibrary.createJLabel(
-                "Find:    ",
-                WINDOW_COLUMN_THREE_X,
-                10,
-                this,
-                layout);
+            "Find:    ",
+            WINDOW_COLUMN_THREE_X,
+            10,
+            this,
+            layout
+        );
 
         Font currentFont = label.getFont();
         label.setFont(new Font(label.getName(), Font.BOLD, currentFont.getSize()));
@@ -84,64 +94,122 @@ public class Tracker extends Form {
         label.setBackground(Color.BLUE);
     }
 
-    private void addFindTextField() {
-
+    private void addTextFields() {
         textFieldFind = UIComponentLibrary.createJTextField(
-                7,
-                WINDOW_COLUMN_THREE_X + 40,
-                10,
-                this,
-                layout);
+            7,
+            WINDOW_COLUMN_THREE_X + 40,
+            10,
+            this,
+            layout
+        );
     }
 
-    private void addLargeTextArea() {
+    private void addTextArea() {
 
-        largeTextArea = UIComponentLibrary.createJTextArea(
-                7, 30,
-                WINDOW_COLUMN_ONE_X + 40,
-                60,
-                this,
-                layout);
+        viewTextArea = UIComponentLibrary.createJTextArea(
+            7, 30,
+            WINDOW_COLUMN_ONE_X,
+            60,
+            this,
+            layout
+        );
 
-        String valueOfSearchString = "5 May";
-        String textForLargeTextArea = "Birth Days for Months of: " + valueOfSearchString + "\n";
-        textForLargeTextArea = textForLargeTextArea + "\n";
-        textForLargeTextArea = textForLargeTextArea + "Person\tLikes\tDislikes\tDay\tMonth\n";
+        LocalDate now = LocalDate.now();
 
+        String valueOfSearchString = String.format("%s - %s", now.getDayOfMonth(), now.getMonth());
+        String textForLargeTextArea = "Birthdays for this month: " + valueOfSearchString + "\n\n";
+        textForLargeTextArea += "Person\tLikes\tDislikes\tDay  Month\n";
+        textForLargeTextArea += "-------------------------------------------------------------------------------";
 
-        largeTextArea.setText(textForLargeTextArea);
+        // Populate view from startup if the date matches this month
+        for(PersonData person : getPersonMonth(now.getMonthValue())) {
+            textForLargeTextArea += String.format(
+                "%s\t%s\t%s\t%d  %d\n",
+                person.getName(),
+                person.getLikes(),
+                person.getDislikes(),
+                person.getFriendDay(),
+                person.getFriendMonth()
+            );
+        }
 
+        viewTextArea.setText(textForLargeTextArea);
     }
 
 
-    private void addFindButton() {
+    private void addButtons() {
+        // Find action
         ActionListener al = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                java.util.List<PersonDTO> persons = fileIO.read(textFieldFind.getText());
-
-                if (persons != null && !persons.isEmpty()) {
-
-                    for (PersonDTO person : persons) {
-                        JOptionPane.showMessageDialog(windowFrame, person.getName() + " " + person.getLikes());
-                    }
-
-                }
-
-                new Tracker(true).run();
+                // TODO: Set text area to show all results and set Dialog to use results count
+                JOptionPane.showMessageDialog(windowFrame, String.format("%d results found", pdata.size()));
             }
         };
 
         btnFind = UIComponentLibrary.createJButton(
-                "Find",
-                BUTTON_SIZE_WIDTH,
-                BUTTON_SIZE_HEIGHT,
-                WINDOW_COLUMN_THREE_X,
-                32,
-                al,
-                this,
-                layout);
+            "Find",
+            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_THREE_X,
+            32,
+            al,
+            this,
+            layout
+        );
+
+        // TODO: Add this to an edit button
+        // new TrackerEdit("Edit Entries", pdata).run();
     }
 
 
+    /**
+     * @param month
+     * @return a list of persondata that is in month
+     */
+    private List<PersonData> getPersonMonth(int month) {
+        List<PersonData> personMonth = new ArrayList<PersonData>();
 
+        for(PersonData person : pdata) {
+            if (person.getFriendMonth() == month) {
+                personMonth.add(person);
+            }
+        }
+
+        return personMonth;
+    }
+
+
+    /**
+     * @param day
+     * @param month
+     * @return a list of persondata that is in day - month
+     */
+    private List<PersonData> getPersonDayMonth(int day, int month) {
+        List<PersonData> personDayMonth = new ArrayList<PersonData>();
+
+        for(PersonData person : pdata) {
+            if (person.getFriendDay() == day && person.getFriendMonth() == month) {
+                personDayMonth.add(person);
+            }
+        }
+
+        return personDayMonth;
+    }
+
+
+    /**
+     * @param name
+     * @return all persondata with name
+     */
+    private List<PersonData> getWithName(String name) {
+        List<PersonData> personsName = new ArrayList<PersonData>();
+
+        for(PersonData person : pdata) {
+            if (person.getName() == name) {
+                personsName.add(person);
+            }
+        }
+
+        return personsName;
+    }
 }
