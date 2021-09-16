@@ -8,18 +8,22 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Tracker extends Form {
-    private JButton btnFind, btnNew, btnSave, btnDelete;
+
+    public static Tracker instance;
+
+    private JButton btnFind, btnEdit;
     private JButton btnBinarySearch, btnBirthdayInMonth;
     private JButton btnForward, btnFastForward, btnBack, btnRewind;
 
-    private JTextField textFieldFind;
+    private JTextField tfFind;
     private JTextArea viewTextArea;
 
     private List<PersonData> pdata;
 
 
     public Tracker(String title) {
-        super(false, title);
+        super(title);
+        instance = this;
     }
 
     public void run() {
@@ -29,11 +33,7 @@ public class Tracker extends Form {
 
     @Override
     protected void setup() {
-        if (isChild) {
-            this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        } else {
-            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        }
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Load all data
         pdata = FileIO.read();
@@ -66,6 +66,10 @@ public class Tracker extends Form {
         this.setVisible(true);
     }
 
+    public List<PersonData> getPersonData() {
+        return pdata;
+    }
+
     private void addTitleLabel() {
         JLabel label = UIComponentLibrary.createJLabel(
             "Birthday Tracker",
@@ -95,7 +99,7 @@ public class Tracker extends Form {
     }
 
     private void addTextFields() {
-        textFieldFind = UIComponentLibrary.createJTextField(
+        tfFind = UIComponentLibrary.createJTextField(
             7,
             WINDOW_COLUMN_THREE_X + 40,
             10,
@@ -104,27 +108,18 @@ public class Tracker extends Form {
         );
     }
 
-    private void addTextArea() {
-
-        viewTextArea = UIComponentLibrary.createJTextArea(
-            7, 30,
-            WINDOW_COLUMN_ONE_X,
-            60,
-            this,
-            layout
-        );
-
+    public void updateTextView() {
         LocalDate now = LocalDate.now();
 
         String valueOfSearchString = String.format("%s - %s", now.getDayOfMonth(), now.getMonth());
         String textForLargeTextArea = "Birthdays for this month: " + valueOfSearchString + "\n\n";
         textForLargeTextArea += "Person\tLikes\tDislikes\tDay  Month\n";
-        textForLargeTextArea += "-------------------------------------------------------------------------------";
+        textForLargeTextArea += "-------------------------------------------------------------------------------\n";
 
         // Populate view from startup if the date matches this month
-        for(PersonData person : getPersonMonth(now.getMonthValue())) {
+        for(PersonData person : pdata) {
             textForLargeTextArea += String.format(
-                "%s\t%s\t%s\t%d  %d\n",
+                "%s\t%s\t%s\t%d    %d\n",
                 person.getName(),
                 person.getLikes(),
                 person.getDislikes(),
@@ -136,10 +131,22 @@ public class Tracker extends Form {
         viewTextArea.setText(textForLargeTextArea);
     }
 
+    private void addTextArea() {
+        viewTextArea = UIComponentLibrary.createJTextArea(
+            7, 30,
+            WINDOW_COLUMN_ONE_X,
+            60,
+            this,
+            layout
+        );
+
+        updateTextView();
+    }
+
 
     private void addButtons() {
         // Find action
-        ActionListener al = new ActionListener() {
+        ActionListener findAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO: Set text area to show all results and set Dialog to use results count
                 JOptionPane.showMessageDialog(windowFrame, String.format("%d results found", pdata.size()));
@@ -152,13 +159,28 @@ public class Tracker extends Form {
             BUTTON_SIZE_HEIGHT,
             WINDOW_COLUMN_THREE_X,
             32,
-            al,
+            findAction,
             this,
             layout
         );
 
-        // TODO: Add this to an edit button
-        // new TrackerEdit("Edit Entries", pdata).run();
+        // Edit action
+        ActionListener editAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                new TrackerEdit("Edit Entries", pdata).run();
+            }
+        };
+
+        btnEdit = UIComponentLibrary.createJButton(
+            "Edit",
+            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_THREE_X,
+            BUTTON_SIZE_HEIGHT + 40,
+            editAction,
+            this,
+            layout
+        );
     }
 
 

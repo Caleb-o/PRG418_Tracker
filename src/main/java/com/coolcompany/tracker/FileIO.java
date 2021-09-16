@@ -23,7 +23,7 @@ public final class FileIO {
 
             // Read each line
             while(reader.hasNextLine()) {
-                pdata.add(new PersonData(reader.nextLine().split(",")));
+                pdata.add(new PersonData(reader.nextLine().split(", ")));
             }
             reader.close();
 
@@ -41,18 +41,23 @@ public final class FileIO {
     public static void create(final PersonData person) {
         try {
             FileWriter writer = new FileWriter("friend_data.csv", true);
-            writer.write(person.getCSVData());
+            writer.write(person.getCSVData() + "\n");
             writer.close();
         } catch (IOException e) {
             System.out.println("Could not write to file: \"friend_data.csv\".");
         }
     }
 
+
+    /**
+     * Update the data on disk with all entries
+     * @param personData
+     */
     public static void update(final List<PersonData> personData) {
         try {
             FileWriter writer = new FileWriter("friend_data.csv");
             for(PersonData person : personData) {
-                writer.write(person.getCSVData());
+                writer.write(person.getCSVData() + "\n");
             }
             writer.close();
         } catch (IOException e) {

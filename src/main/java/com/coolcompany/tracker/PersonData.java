@@ -20,7 +20,7 @@ public class PersonData implements Comparable<Object> {
 
     // PersonData constructor for CSV data (Expects 5 args)
     public PersonData(String[] data) {
-        this(data[0], data[1], data[2], Integer.parseInt(data[3]), Integer.parseInt(data[4]));
+        this(data[0], data[1], data[2], Integer.parseInt(data[3]), Integer.parseInt(data[4].substring(0, data[4].length() - 1)));
     }
 
     public PersonData(String name, String likes, String dislikes, int friendDay, int friendMonth) {

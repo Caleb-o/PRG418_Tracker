@@ -2,6 +2,7 @@ package com.coolcompany.tracker;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 
 public abstract class Form extends JFrame {
 
@@ -20,16 +21,16 @@ public abstract class Form extends JFrame {
     protected boolean isChild;
 
     public Form() {
-        this(false, "Window");
+        this("Window");
     }
 
-    public Form(boolean isChild) {
-        this(isChild, "Window");
-    }
-
-    public Form(boolean isChild, String title) { 
-        this.isChild = isChild;
+    public Form(String title) {
         this.setTitle(title);
+        windowFrame = this;
+    }
+
+    public void exit() {
+        this.dispatchEvent(new WindowEvent(windowFrame, WindowEvent.WINDOW_CLOSING));
     }
 
     public abstract void run();

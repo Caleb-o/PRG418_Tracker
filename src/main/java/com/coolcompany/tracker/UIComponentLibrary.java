@@ -23,11 +23,12 @@ public class UIComponentLibrary
         frame.add(myButton); //Adds button to frame
         return myButton; //Returns completed button to caller.
     }
-/*
-    textArea = new JTextArea(5, 20);
-    JScrollPane scrollPane = new JScrollPane(textArea);
-textArea.setEditable(false);
-  */
+    
+    /*
+        textArea = new JTextArea(5, 20);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+    textArea.setEditable(false);
+    */
     public static JTextField createJTextField(int size,
                                                int posX,
                                                int posY,
@@ -38,7 +39,7 @@ textArea.setEditable(false);
         layout.putConstraint(SpringLayout.WEST,myTextField,posX, SpringLayout.WEST,  frame);//Sets text field's X Coordinates
         layout.putConstraint(SpringLayout.NORTH,myTextField,posY, SpringLayout.NORTH,  frame);//Sets text field's Y Coordinates
         frame.add(myTextField); //Adds text field to frame
-        return  myTextField; //Returns completed text field to caller
+        return myTextField; //Returns completed text field to caller
     }
 
     public static JTextArea createJTextArea(int rows, int columns,
@@ -51,7 +52,7 @@ textArea.setEditable(false);
         layout.putConstraint(SpringLayout.WEST,myTextArea,posX, SpringLayout.WEST,  frame);//Sets text field's X Coordinates
         layout.putConstraint(SpringLayout.NORTH,myTextArea,posY, SpringLayout.NORTH,  frame);//Sets text field's Y Coordinates
         frame.add(myTextArea); //Adds text field to frame
-        return  myTextArea; //Returns completed text field to caller
+        return myTextArea; //Returns completed text field to caller
     }
 
 
