@@ -29,7 +29,5 @@ public class BinarySearchDateArray {
         int index = Arrays.binarySearch(localDates, key);
 
         System.out.println(index);
-
     }
-
 }

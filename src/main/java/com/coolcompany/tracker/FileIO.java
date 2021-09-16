@@ -53,10 +53,10 @@ public final class FileIO {
      * Update the data on disk with all entries
      * @param personData
      */
-    public static void update(final List<PersonData> personData) {
+    public static void update() {
         try {
             FileWriter writer = new FileWriter("friend_data.csv");
-            for(PersonData person : personData) {
+            for(PersonData person : Tracker.instance.getPersonData()) {
                 writer.write(person.getCSVData() + "\n");
             }
             writer.close();

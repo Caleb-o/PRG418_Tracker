@@ -13,10 +13,11 @@ public class Tracker extends Form {
 
     private JButton btnFind, btnEdit;
     private JButton btnBinarySearch, btnBirthdayInMonth;
-    private JButton btnForward, btnFastForward, btnBack, btnRewind;
 
     private JTextField tfFind;
     private JTextArea viewTextArea;
+
+    private JCheckBox chkShowAll;
 
     private List<PersonData> pdata;
 
@@ -45,6 +46,7 @@ public class Tracker extends Form {
         addTextFields();
         addButtons();
         addTextArea();
+        addCheckBox();
 
         // apply layout to Form
         Container contentPane = this.getContentPane();
@@ -70,6 +72,10 @@ public class Tracker extends Form {
         return pdata;
     }
 
+    public int getDataSize() {
+        return pdata.size();
+    }
+
     private void addTitleLabel() {
         JLabel label = UIComponentLibrary.createJLabel(
             "Birthday Tracker",
@@ -85,8 +91,8 @@ public class Tracker extends Form {
     private void addLabels() {
         JLabel label = UIComponentLibrary.createJLabel(
             "Find:    ",
-            WINDOW_COLUMN_THREE_X,
-            10,
+            WINDOW_COLUMN_ONE_X,
+            WINDOW_SIZE_HEIGHT - 64,
             this,
             layout
         );
@@ -101,14 +107,99 @@ public class Tracker extends Form {
     private void addTextFields() {
         tfFind = UIComponentLibrary.createJTextField(
             7,
-            WINDOW_COLUMN_THREE_X + 40,
-            10,
+            WINDOW_COLUMN_ONE_X + 40,
+            WINDOW_SIZE_HEIGHT - 64,
             this,
             layout
         );
     }
 
-    public void updateTextView() {
+
+    private void addTextArea() {
+        viewTextArea = UIComponentLibrary.createJTextArea(
+            10, 40,
+            WINDOW_COLUMN_ONE_X,
+            32,
+            this,
+            layout
+        );
+
+        updateTextViewAll(true);
+    }
+
+
+    private void addCheckBox() {
+        ActionListener showAllAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                updateTextViewAll(!chkShowAll.isSelected());
+            }
+        };
+        
+        chkShowAll = UIComponentLibrary.createJCheckBox(
+            "Show All",
+            WINDOW_COLUMN_ONE_X, 
+            200,
+            false,
+            showAllAction,
+            this,
+            layout
+        );
+    }
+
+
+    private void addButtons() {
+        // Find action
+        ActionListener findAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String text = tfFind.getText();
+
+                if (text.length() == 0) {
+                    return;
+                }
+
+                PersonData person = getWithName(text);
+
+                if (person == null) {
+                    JOptionPane.showMessageDialog(null, String.format("Could not find anyone with name: \"%s\"", text), "Search Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                updateTextViewPerson(person);
+            }
+        };
+
+        ActionListener editAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                new TrackerEdit("Edit Entries").run();
+            }
+        };
+
+        
+        btnFind = UIComponentLibrary.createJButton(
+            "Find",
+            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_TWO_X - 24,
+            WINDOW_SIZE_HEIGHT - 64,
+            findAction,
+            this,
+            layout
+        );
+
+        btnEdit = UIComponentLibrary.createJButton(
+            "Edit",
+            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_THREE_X,
+            WINDOW_SIZE_HEIGHT - 64,
+            editAction,
+            this,
+            layout
+        );
+    }
+
+
+    private void updateTextViewBase() {
         LocalDate now = LocalDate.now();
 
         String valueOfSearchString = String.format("%s - %s", now.getDayOfMonth(), now.getMonth());
@@ -116,8 +207,42 @@ public class Tracker extends Form {
         textForLargeTextArea += "Person\tLikes\tDislikes\tDay  Month\n";
         textForLargeTextArea += "-------------------------------------------------------------------------------\n";
 
+        viewTextArea.setText(textForLargeTextArea);
+    }
+
+    public void updateTextViewPerson(final PersonData person) {
+        updateTextViewBase();
+
+        String textForLargeTextArea = viewTextArea.getText();
+
+        textForLargeTextArea += String.format(
+            "%s\t%s\t%s\t%d    %d\n",
+            person.getName(),
+            person.getLikes(),
+            person.getDislikes(),
+            person.getFriendDay(),
+            person.getFriendMonth()
+        );
+
+        viewTextArea.setText(textForLargeTextArea);
+    }
+
+
+    public void updateTextViewAll(boolean thisMonth) {
+        updateTextViewBase();
+
+        String textForLargeTextArea = viewTextArea.getText();
+
+        List<PersonData> people;
+
+        if (thisMonth) {
+            people = getPersonMonth(LocalDate.now().getMonthValue());
+        } else {
+            people = pdata;
+        }
+
         // Populate view from startup if the date matches this month
-        for(PersonData person : pdata) {
+        for(PersonData person : people) {
             textForLargeTextArea += String.format(
                 "%s\t%s\t%s\t%d    %d\n",
                 person.getName(),
@@ -128,59 +253,11 @@ public class Tracker extends Form {
             );
         }
 
+        if (people.isEmpty()) {
+            textForLargeTextArea += "No birthdays to show";
+        }
+
         viewTextArea.setText(textForLargeTextArea);
-    }
-
-    private void addTextArea() {
-        viewTextArea = UIComponentLibrary.createJTextArea(
-            7, 30,
-            WINDOW_COLUMN_ONE_X,
-            60,
-            this,
-            layout
-        );
-
-        updateTextView();
-    }
-
-
-    private void addButtons() {
-        // Find action
-        ActionListener findAction = new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                // TODO: Set text area to show all results and set Dialog to use results count
-                JOptionPane.showMessageDialog(windowFrame, String.format("%d results found", pdata.size()));
-            }
-        };
-
-        btnFind = UIComponentLibrary.createJButton(
-            "Find",
-            BUTTON_SIZE_WIDTH,
-            BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_THREE_X,
-            32,
-            findAction,
-            this,
-            layout
-        );
-
-        // Edit action
-        ActionListener editAction = new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                new TrackerEdit("Edit Entries", pdata).run();
-            }
-        };
-
-        btnEdit = UIComponentLibrary.createJButton(
-            "Edit",
-            BUTTON_SIZE_WIDTH,
-            BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_THREE_X,
-            BUTTON_SIZE_HEIGHT + 40,
-            editAction,
-            this,
-            layout
-        );
     }
 
 
@@ -221,17 +298,15 @@ public class Tracker extends Form {
 
     /**
      * @param name
-     * @return all persondata with name
+     * @return person with name
      */
-    private List<PersonData> getWithName(String name) {
-        List<PersonData> personsName = new ArrayList<PersonData>();
-
+    private PersonData getWithName(String name) {
         for(PersonData person : pdata) {
             if (person.getName() == name) {
-                personsName.add(person);
+                return person;
             }
         }
 
-        return personsName;
+        return null;
     }
 }

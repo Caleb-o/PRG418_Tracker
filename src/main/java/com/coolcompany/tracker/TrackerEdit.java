@@ -4,13 +4,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
-import java.util.List;
 
 public class TrackerEdit extends Form {
     private static TrackerEdit instance;
     
     private JButton btnNew, btnCreate, btnSave, btnDelete;
+    private JButton btnForward, btnFastForward, btnBack, btnRewind;
     private JTextField tfName, tfLikes, tfDisklikes, tfDay, tfMonth;
+    private JLabel countLabel;
+
+    private int index = 0;
+    private int maxIndex;
 
 
     public TrackerEdit(String title) {
@@ -20,11 +24,14 @@ public class TrackerEdit extends Form {
             instance.exit();
         }
         instance = this;
+
+        maxIndex = Tracker.instance.getDataSize();
     }
 
     public void run() {
         windowFrame = this;
         setup();
+        setFields();
     }
 
     @Override
@@ -37,6 +44,7 @@ public class TrackerEdit extends Form {
         addLabels();
         addTextFields();
         addButtons();
+        addNavigationButtons();
 
         resetFields();
 
@@ -113,6 +121,15 @@ public class TrackerEdit extends Form {
             layout
         );
 
+        countLabel = UIComponentLibrary.createJLabel(
+            String.format("%d/%d", index + 1, maxIndex),
+            WINDOW_COLUMN_ONE_X + 5 + BUTTON_NAV_SIZE_WIDTH * 2,
+            130,
+            this,
+            layout
+        );
+
+
         Font currentFont = nameLabel.getFont();
 
         nameLabel.setFont(new Font(nameLabel.getName(), Font.BOLD, currentFont.getSize()));
@@ -139,6 +156,10 @@ public class TrackerEdit extends Form {
         monthLabel.setForeground(Color.WHITE);
         monthLabel.setOpaque(true);
         monthLabel.setBackground(Color.BLUE);
+
+        countLabel.setFont(new Font(nameLabel.getName(), Font.BOLD, currentFont.getSize()));
+        countLabel.setForeground(Color.BLACK);
+        countLabel.setOpaque(true);
     }
 
     private void addTextFields() {
@@ -199,7 +220,7 @@ public class TrackerEdit extends Form {
                 }
 
                 PersonData person = personFromFields();
-                pdata.add(person);
+                Tracker.instance.getPersonData().add(person);
 
                 FileIO.create(person);
 
@@ -207,7 +228,11 @@ public class TrackerEdit extends Form {
 
                 resetFields();
 
-                Tracker.instance.updateTextView();
+                Tracker.instance.updateTextViewAll(true);
+
+                maxIndex = Tracker.instance.getDataSize();
+                index = maxIndex - 1;
+                setFields();
             }
         };
 
@@ -219,7 +244,8 @@ public class TrackerEdit extends Form {
                 }
 
                 updatePerson();
-                Tracker.instance.updateTextView();
+
+                maxIndex = Tracker.instance.getDataSize();
             }
         };
 
@@ -245,7 +271,13 @@ public class TrackerEdit extends Form {
 
                 if (option == 0) {
                     removePerson();
-                    Tracker.instance.updateTextView();
+                    maxIndex = Tracker.instance.getDataSize();
+
+                    if (index >= maxIndex) {
+                        index = 0;
+                    }
+
+                    setFields();
                 }
             }
         };
@@ -295,6 +327,105 @@ public class TrackerEdit extends Form {
         );
     }
 
+
+    private void addNavigationButtons() {
+        ActionListener rewindAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                index = 0;
+                setFields();
+            }
+        };
+
+        ActionListener backAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                if (--index < 0) {
+                    index = maxIndex - 1;
+                }
+
+                setFields();
+            }
+        };
+        
+        ActionListener forwardAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                if (++index >= maxIndex) {
+                    index = 0;
+                }
+
+                setFields();
+            }
+        };
+
+        ActionListener fastForwardAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                index = maxIndex - 1;
+                setFields();
+            }
+        };
+
+
+        btnRewind = UIComponentLibrary.createJButton(
+            "<<",
+            BUTTON_NAV_SIZE_WIDTH,
+            BUTTON_NAV_SIZE_HEIGHT,
+            WINDOW_COLUMN_ONE_X,
+            150,
+            rewindAction,
+            this,
+            layout
+        );
+
+        btnBack = UIComponentLibrary.createJButton(
+            "<",
+            BUTTON_NAV_SIZE_WIDTH,
+            BUTTON_NAV_SIZE_HEIGHT,
+            WINDOW_COLUMN_ONE_X + (10 + BUTTON_NAV_SIZE_WIDTH),
+            150,
+            backAction,
+            this,
+            layout
+        );
+
+        btnForward = UIComponentLibrary.createJButton(
+            ">",
+            BUTTON_NAV_SIZE_WIDTH,
+            BUTTON_NAV_SIZE_HEIGHT,
+            WINDOW_COLUMN_ONE_X + (10 + BUTTON_NAV_SIZE_WIDTH) * 2,
+            150,
+            forwardAction,
+            this,
+            layout
+        );
+
+        btnFastForward = UIComponentLibrary.createJButton(
+            ">>",
+            BUTTON_NAV_SIZE_WIDTH,
+            BUTTON_NAV_SIZE_HEIGHT,
+            WINDOW_COLUMN_ONE_X + (10 + BUTTON_NAV_SIZE_WIDTH) * 3,
+            150,
+            fastForwardAction,
+            this,
+            layout
+        );
+    }
+
+
+    private void setFields() {
+        if (maxIndex > 0) {
+            countLabel.setText(String.format("%d/%d", index + 1, maxIndex));
+            PersonData person = Tracker.instance.getPersonData().get(index);
+
+            tfName.setText(person.getName());
+            tfLikes.setText(person.getLikes());
+            tfDisklikes.setText(person.getDislikes());
+            tfDay.setText(String.format("%d", person.getFriendDay()));
+            tfMonth.setText(String.format("%d", person.getFriendMonth()));
+        } else {
+            countLabel.setText(String.format("%d/%d", 0, maxIndex));
+            resetFields();
+        }
+    }
+
     
     private PersonData personFromFields() {
         return new PersonData(
@@ -325,8 +456,10 @@ public class TrackerEdit extends Form {
         String personName = tfName.getText();
         PersonData person = null;
 
-        for(PersonData per : pdata) {
-            if (per.getName() == personName) {
+        for(PersonData per : Tracker.instance.getPersonData()) {
+            System.out.println(per.getName() + " == " + personName + " = " + (per.getName() == personName));
+
+            if (per.getName().equals(personName)) {
                 person = per;
                 break;
             }
@@ -338,7 +471,7 @@ public class TrackerEdit extends Form {
 
             int option = JOptionPane.showOptionDialog(
                 null, 
-                String.format("\"%s\" does not exist. Would you like to add it?"), 
+                String.format("\"%s\" does not exist. Would you like to add it?", tfName.getText()), 
                 "Update Entry", 
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
@@ -348,7 +481,7 @@ public class TrackerEdit extends Form {
             );
 
             if (option == 0) {
-                pdata.add(personFromFields());
+                Tracker.instance.getPersonData().add(personFromFields());
             }
         } else {
             // Update existing
@@ -359,26 +492,24 @@ public class TrackerEdit extends Form {
         }
 
         // Update on disk
-        FileIO.update(pdata);
+        FileIO.update();
+        Tracker.instance.updateTextViewAll(true);
     }
 
 
     private void removePerson() {
         String personName = tfName.getText();
 
-        System.out.println(String.format("'%s'", personName));
-
-        for(PersonData person : pdata) {
-            System.out.println("Person: " + person.getName());
-
-            if (person.getName() == personName) {
-                System.out.println("Found person!");
-                pdata.remove(person);
+        for(PersonData person : Tracker.instance.getPersonData()) {
+            if (person.getName().equals(personName)) {
+                // Person has been found
+                Tracker.instance.getPersonData().remove(person);
                 break;
             }
         }
 
         // Update on disk
-        FileIO.update(pdata);
+        FileIO.update();
+        Tracker.instance.updateTextViewAll(true);
     }
 }
