@@ -5,14 +5,10 @@ import java.awt.event.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Tracker extends Form {
 
     public static Tracker instance;
-
-    private JButton btnFind, btnEdit;
-    private JButton btnBinarySearch, btnBirthdayInMonth;
 
     private JTextField tfFind;
     private JTextArea viewTextArea;
@@ -41,12 +37,11 @@ public class Tracker extends Form {
 
         // add GUI objects
         addTitleLabel();
-
-        addLabels();
+        
+        addCheckBox();
         addTextFields();
         addButtons();
         addTextArea();
-        addCheckBox();
 
         // apply layout to Form
         Container contentPane = this.getContentPane();
@@ -88,26 +83,10 @@ public class Tracker extends Form {
         label.setForeground(Color.BLACK);
     }
 
-    private void addLabels() {
-        JLabel label = UIComponentLibrary.createJLabel(
-            "Find:    ",
-            WINDOW_COLUMN_ONE_X,
-            WINDOW_SIZE_HEIGHT - 64,
-            this,
-            layout
-        );
-
-        Font currentFont = label.getFont();
-        label.setFont(new Font(label.getName(), Font.BOLD, currentFont.getSize()));
-        label.setForeground(Color.WHITE);
-        label.setOpaque(true);
-        label.setBackground(Color.BLUE);
-    }
-
     private void addTextFields() {
         tfFind = UIComponentLibrary.createJTextField(
-            7,
-            WINDOW_COLUMN_ONE_X + 40,
+            10,
+            WINDOW_COLUMN_ONE_X,
             WINDOW_SIZE_HEIGHT - 64,
             this,
             layout
@@ -117,7 +96,7 @@ public class Tracker extends Form {
 
     private void addTextArea() {
         viewTextArea = UIComponentLibrary.createJTextArea(
-            10, 40,
+            10, 42,
             WINDOW_COLUMN_ONE_X,
             32,
             this,
@@ -157,7 +136,7 @@ public class Tracker extends Form {
                     return;
                 }
 
-                PersonData person = getWithName(text);
+                PersonData person = Search.getWithName(text);
 
                 if (person == null) {
                     JOptionPane.showMessageDialog(null, String.format("Could not find anyone with name: \"%s\"", text), "Search Error", JOptionPane.ERROR_MESSAGE);
@@ -168,29 +147,76 @@ public class Tracker extends Form {
             }
         };
 
+        ActionListener searchAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String text = tfFind.getText();
+
+                if (text.length() == 0) {
+                    return;
+                }
+
+                PersonData person = Search.getWithNameBinary(text);
+
+                if (person == null) {
+                    JOptionPane.showMessageDialog(null, String.format("Could not find anyone with name: \"%s\"", text), "Search Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                updateTextViewPerson(person);
+            }
+        };
+
+        ActionListener resetAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                updateTextViewAll(true);
+            }
+        };
+
         ActionListener editAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 new TrackerEdit("Edit Entries").run();
             }
         };
 
-        
-        btnFind = UIComponentLibrary.createJButton(
+
+        UIComponentLibrary.createJButton(
             "Find",
-            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_WIDTH - 20,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_TWO_X - 24,
+            WINDOW_COLUMN_ONE_X + (20 + BUTTON_SIZE_WIDTH),
             WINDOW_SIZE_HEIGHT - 64,
             findAction,
             this,
             layout
         );
 
-        btnEdit = UIComponentLibrary.createJButton(
-            "Edit",
-            BUTTON_SIZE_WIDTH,
+        UIComponentLibrary.createJButton(
+            "Search",
+            BUTTON_SIZE_WIDTH - 20,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_THREE_X,
+            WINDOW_COLUMN_ONE_X + (10 + BUTTON_SIZE_WIDTH) * 2 - 20,
+            WINDOW_SIZE_HEIGHT - 64,
+            searchAction,
+            this,
+            layout
+        );
+
+        UIComponentLibrary.createJButton(
+            "Reset",
+            BUTTON_SIZE_WIDTH - 20,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_THREE_X + 40,
+            10,
+            resetAction,
+            this,
+            layout
+        );
+
+        UIComponentLibrary.createJButton(
+            "Edit",
+            BUTTON_SIZE_WIDTH - 10,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_THREE_X + 40,
             WINDOW_SIZE_HEIGHT - 64,
             editAction,
             this,
@@ -204,8 +230,8 @@ public class Tracker extends Form {
 
         String valueOfSearchString = String.format("%s - %s", now.getDayOfMonth(), now.getMonth());
         String textForLargeTextArea = "Birthdays for this month: " + valueOfSearchString + "\n\n";
-        textForLargeTextArea += "Person\tLikes\tDislikes\tDay  Month\n";
-        textForLargeTextArea += "-------------------------------------------------------------------------------\n";
+        textForLargeTextArea += "Person\tLikes\tDislikes\tDay    Month\n";
+        textForLargeTextArea += "--------------------------------------------------------------------------------\n";
 
         viewTextArea.setText(textForLargeTextArea);
     }
@@ -216,7 +242,7 @@ public class Tracker extends Form {
         String textForLargeTextArea = viewTextArea.getText();
 
         textForLargeTextArea += String.format(
-            "%s\t%s\t%s\t%d    %d\n",
+            "%s\t%s\t%s\t%d\t\t%d\n",
             person.getName(),
             person.getLikes(),
             person.getDislikes(),
@@ -235,8 +261,8 @@ public class Tracker extends Form {
 
         List<PersonData> people;
 
-        if (thisMonth) {
-            people = getPersonMonth(LocalDate.now().getMonthValue());
+        if (thisMonth && !chkShowAll.isSelected()) {
+            people = Search.getPersonMonth(LocalDate.now().getMonthValue());
         } else {
             people = pdata;
         }
@@ -258,55 +284,5 @@ public class Tracker extends Form {
         }
 
         viewTextArea.setText(textForLargeTextArea);
-    }
-
-
-    /**
-     * @param month
-     * @return a list of persondata that is in month
-     */
-    private List<PersonData> getPersonMonth(int month) {
-        List<PersonData> personMonth = new ArrayList<PersonData>();
-
-        for(PersonData person : pdata) {
-            if (person.getFriendMonth() == month) {
-                personMonth.add(person);
-            }
-        }
-
-        return personMonth;
-    }
-
-
-    /**
-     * @param day
-     * @param month
-     * @return a list of persondata that is in day - month
-     */
-    private List<PersonData> getPersonDayMonth(int day, int month) {
-        List<PersonData> personDayMonth = new ArrayList<PersonData>();
-
-        for(PersonData person : pdata) {
-            if (person.getFriendDay() == day && person.getFriendMonth() == month) {
-                personDayMonth.add(person);
-            }
-        }
-
-        return personDayMonth;
-    }
-
-
-    /**
-     * @param name
-     * @return person with name
-     */
-    private PersonData getWithName(String name) {
-        for(PersonData person : pdata) {
-            if (person.getName() == name) {
-                return person;
-            }
-        }
-
-        return null;
     }
 }

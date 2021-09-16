@@ -8,8 +8,7 @@ import java.time.LocalDate;
 public class TrackerEdit extends Form {
     private static TrackerEdit instance;
     
-    private JButton btnNew, btnCreate, btnSave, btnDelete;
-    private JButton btnForward, btnFastForward, btnBack, btnRewind;
+    private JTextField tfFind;
     private JTextField tfName, tfLikes, tfDisklikes, tfDay, tfMonth;
     private JLabel countLabel;
 
@@ -81,6 +80,14 @@ public class TrackerEdit extends Form {
     }
 
     private void addLabels() {
+        JLabel findLabel = UIComponentLibrary.createJLabel(
+            "Find:    ",
+            WINDOW_COLUMN_ONE_X,
+            WINDOW_SIZE_HEIGHT - 64,
+            this,
+            layout
+        );
+
         JLabel nameLabel = UIComponentLibrary.createJLabel(
             "New:       ",
             WINDOW_COLUMN_ONE_X,
@@ -132,6 +139,11 @@ public class TrackerEdit extends Form {
 
         Font currentFont = nameLabel.getFont();
 
+        findLabel.setFont(new Font(nameLabel.getName(), Font.BOLD, currentFont.getSize()));
+        findLabel.setForeground(Color.WHITE);
+        findLabel.setOpaque(true);
+        findLabel.setBackground(Color.BLUE);
+
         nameLabel.setFont(new Font(nameLabel.getName(), Font.BOLD, currentFont.getSize()));
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setOpaque(true);
@@ -163,6 +175,15 @@ public class TrackerEdit extends Form {
     }
 
     private void addTextFields() {
+        tfFind = UIComponentLibrary.createJTextField(
+            7,
+            WINDOW_COLUMN_ONE_X + 40,
+            WINDOW_SIZE_HEIGHT - 64,
+            this,
+            layout
+        );
+
+
         tfName = UIComponentLibrary.createJTextField(
             10,
             WINDOW_COLUMN_ONE_X + 60,
@@ -206,6 +227,25 @@ public class TrackerEdit extends Form {
 
 
     private void addButtons() {
+        ActionListener findAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String text = tfFind.getText();
+
+                if (text.length() == 0) {
+                    return;
+                }
+
+                PersonData person = Search.getWithName(text);
+
+                if (person == null) {
+                    JOptionPane.showMessageDialog(null, String.format("Could not find anyone with name: \"%s\"", text), "Search Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                fieldsFromPerson(person);
+            }
+        };
+
         ActionListener newAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 resetFields();
@@ -282,7 +322,19 @@ public class TrackerEdit extends Form {
             }
         };
 
-        btnNew = UIComponentLibrary.createJButton(
+
+        UIComponentLibrary.createJButton(
+            "Find",
+            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_TWO_X - 24,
+            WINDOW_SIZE_HEIGHT - 64,
+            findAction,
+            this,
+            layout
+        );
+
+        UIComponentLibrary.createJButton(
             "New",
             BUTTON_SIZE_WIDTH,
             BUTTON_SIZE_HEIGHT,
@@ -293,7 +345,7 @@ public class TrackerEdit extends Form {
             layout
         );
 
-        btnCreate = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             "Create",
             BUTTON_SIZE_WIDTH,
             BUTTON_SIZE_HEIGHT,
@@ -304,7 +356,7 @@ public class TrackerEdit extends Form {
             layout
         );
 
-        btnSave = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             "Update",
             BUTTON_SIZE_WIDTH,
             BUTTON_SIZE_HEIGHT,
@@ -315,7 +367,7 @@ public class TrackerEdit extends Form {
             layout
         );
 
-        btnDelete = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             "Delete",
             BUTTON_SIZE_WIDTH,
             BUTTON_SIZE_HEIGHT,
@@ -364,7 +416,7 @@ public class TrackerEdit extends Form {
         };
 
 
-        btnRewind = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             "<<",
             BUTTON_NAV_SIZE_WIDTH,
             BUTTON_NAV_SIZE_HEIGHT,
@@ -375,7 +427,7 @@ public class TrackerEdit extends Form {
             layout
         );
 
-        btnBack = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             "<",
             BUTTON_NAV_SIZE_WIDTH,
             BUTTON_NAV_SIZE_HEIGHT,
@@ -386,7 +438,7 @@ public class TrackerEdit extends Form {
             layout
         );
 
-        btnForward = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             ">",
             BUTTON_NAV_SIZE_WIDTH,
             BUTTON_NAV_SIZE_HEIGHT,
@@ -397,7 +449,7 @@ public class TrackerEdit extends Form {
             layout
         );
 
-        btnFastForward = UIComponentLibrary.createJButton(
+        UIComponentLibrary.createJButton(
             ">>",
             BUTTON_NAV_SIZE_WIDTH,
             BUTTON_NAV_SIZE_HEIGHT,
@@ -413,17 +465,20 @@ public class TrackerEdit extends Form {
     private void setFields() {
         if (maxIndex > 0) {
             countLabel.setText(String.format("%d/%d", index + 1, maxIndex));
-            PersonData person = Tracker.instance.getPersonData().get(index);
-
-            tfName.setText(person.getName());
-            tfLikes.setText(person.getLikes());
-            tfDisklikes.setText(person.getDislikes());
-            tfDay.setText(String.format("%d", person.getFriendDay()));
-            tfMonth.setText(String.format("%d", person.getFriendMonth()));
+            fieldsFromPerson(Tracker.instance.getPersonData().get(index));
         } else {
             countLabel.setText(String.format("%d/%d", 0, maxIndex));
             resetFields();
         }
+    }
+
+
+    private void fieldsFromPerson(final PersonData person) {
+        tfName.setText(person.getName());
+        tfLikes.setText(person.getLikes());
+        tfDisklikes.setText(person.getDislikes());
+        tfDay.setText(String.format("%d", person.getFriendDay()));
+        tfMonth.setText(String.format("%d", person.getFriendMonth()));
     }
 
     

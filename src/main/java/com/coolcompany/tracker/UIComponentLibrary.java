@@ -3,6 +3,8 @@ package com.coolcompany.tracker;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 
 public class UIComponentLibrary
 {
@@ -26,11 +28,7 @@ public class UIComponentLibrary
         return button; //Returns completed button to caller.
     }
     
-    /*
-        textArea = new JTextArea(5, 20);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-    textArea.setEditable(false);
-    */
+
     public static JTextField createJTextField(int size,
                                                int posX,
                                                int posY,
@@ -38,6 +36,13 @@ public class UIComponentLibrary
                                                SpringLayout layout)
     {
         JTextField textField = new JTextField(size); //Creates JTextField and sets size
+        textField.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent evt) {
+                if (textField.getText().length() >= size) {
+                    evt.consume();
+                }
+            }
+        });
 
         layout.putConstraint(SpringLayout.WEST, textField, posX, SpringLayout.WEST, frame);//Sets text field's X Coordinates
         layout.putConstraint(SpringLayout.NORTH, textField, posY, SpringLayout.NORTH, frame);//Sets text field's Y Coordinates
@@ -45,6 +50,7 @@ public class UIComponentLibrary
         frame.add(textField); //Adds text field to frame
         return textField; //Returns completed text field to caller
     }
+
 
     public static JTextArea createJTextArea(int rows, int columns,
                                               int posX,
@@ -54,6 +60,7 @@ public class UIComponentLibrary
     {
         JTextArea textArea = new JTextArea(rows, columns); //Creates JTextField and sets size
         textArea.setEditable(false);
+        textArea.setMaximumSize(new Dimension(rows, columns));
 
         layout.putConstraint(SpringLayout.WEST, textArea, posX, SpringLayout.WEST, frame);//Sets text field's X Coordinates
         layout.putConstraint(SpringLayout.NORTH, textArea, posY, SpringLayout.NORTH, frame);//Sets text field's Y Coordinates
@@ -61,6 +68,7 @@ public class UIComponentLibrary
         frame.add(textArea); //Adds text field to frame
         return textArea; //Returns completed text field to caller
     }
+
 
     public static JCheckBox createJCheckBox(String text,
                                             int posX,
