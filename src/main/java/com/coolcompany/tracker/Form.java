@@ -23,19 +23,36 @@ public abstract class Form extends JFrame {
     protected Frame windowFrame;
     protected boolean isChild;
 
+    /**
+     * Simple Constructor that sets Title to "Window"
+     */
     public Form() {
         this("Window");
     }
 
+    /**
+     * Constructor that gives the form a title
+     * @param title
+     */
     public Form(String title) {
         this.setTitle(title);
         windowFrame = this;
     }
 
+    /**
+     * Send an event to the Window to close the form
+     */
     public void exit() {
         this.dispatchEvent(new WindowEvent(windowFrame, WindowEvent.WINDOW_CLOSING));
     }
 
+    /**
+     * Abstract run function to override
+     */
     public abstract void run();
+
+    /**
+     * Abstract setup function to override
+     */
     protected abstract void setup();
 }

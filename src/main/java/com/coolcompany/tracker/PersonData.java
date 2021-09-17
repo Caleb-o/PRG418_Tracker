@@ -2,7 +2,7 @@ package com.coolcompany.tracker;
 
 import java.time.LocalDate;
 
-public class PersonData implements Comparable<Object> {
+public class PersonData {
 
     private String name;
     private String likes;
@@ -10,19 +10,40 @@ public class PersonData implements Comparable<Object> {
     private int friendDay;
     private int friendMonth;
 
+    /**
+     * Create a person only using name
+     * @param name
+     */
     public PersonData(String name) {
         this(name, "None", "None", LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue());
     }
 
+    /**
+     * Create a person with string values
+     * @param name
+     * @param likes
+     * @param dislikes
+     */
     public PersonData(String name, String likes, String dislikes) {
         this(name, likes, dislikes, LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue());
     }
 
-    // PersonData constructor for CSV data (Expects 5 args)
+    /**
+     * PersonData constructor for CSV data (Expects 5 args)
+     * @param data
+     */
     public PersonData(String[] data) {
         this(data[0], data[1], data[2], Integer.parseInt(data[3]), Integer.parseInt(data[4].substring(0, data[4].length() - 1)));
     }
 
+    /**
+     * Base constructor to set all fields
+     * @param name
+     * @param likes
+     * @param dislikes
+     * @param friendDay
+     * @param friendMonth
+     */
     public PersonData(String name, String likes, String dislikes, int friendDay, int friendMonth) {
         this.name = name;
         this.likes = likes;
@@ -77,29 +98,5 @@ public class PersonData implements Comparable<Object> {
      */
     public String getCSVData() {
         return String.format("%s, %s, %s, %d, %d,", name, likes, dislikes, friendDay, friendMonth);
-    }
-
-    @Override
-    public int compareTo(Object otherPerson) {
-
-        // the 'instanceof' lets you check if a variable is of a
-        // particular type.
-
-        // Arrays.BinarySearch will call 'compareTo' with the 'key' as per the java doc.
-        if (otherPerson instanceof String) {
-            // the otherPerson variable is a String. So compare the String agisnt this.getName()
-            return CharSequence.compare(this.getName(), (String)otherPerson);
-        }
-
-        // Arrays.sort will call 'compareTo' with a PersonDTO as 'otherPerson'
-        if (otherPerson instanceof PersonData) {
-            // we can compare the getName() methods against each other
-            return CharSequence.compare(this.getName(), ((PersonData)otherPerson).getName());
-        }
-
-        // return 0 by default. Theoretically this should never happen
-        // as we only compare with a String (name field) or a PersonDTO.
-        return 0;
-
     }
 }

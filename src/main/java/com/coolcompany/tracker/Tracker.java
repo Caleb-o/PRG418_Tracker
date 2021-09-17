@@ -23,11 +23,20 @@ public class Tracker extends Form {
         instance = this;
     }
 
+    
+    /**
+     * Run the form
+     */
+    @Override
     public void run() {
         windowFrame = this;
         setup();
     }
 
+
+    /**
+     * Setup the Form with GUI elements and content loading
+     */
     @Override
     protected void setup() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,14 +96,26 @@ public class Tracker extends Form {
         }
     }
 
+
+    /**
+     * @return PersonData list field
+     */
     public List<PersonData> getPersonData() {
         return pdata;
     }
 
+
+    /**
+     * @return size of PersonData list
+     */
     public int getDataSize() {
         return pdata.size();
     }
 
+
+    /**
+     * Adds a title label element to the form
+     */
     private void addTitleLabel() {
         JLabel label = UIComponentLibrary.createJLabel(
             "Birthday Tracker",
@@ -107,6 +128,10 @@ public class Tracker extends Form {
         label.setForeground(Color.BLACK);
     }
 
+
+    /**
+     * Add all text field elements to the form
+     */
     private void addTextFields() {
         tfFind = UIComponentLibrary.createJTextField(
             10,
@@ -118,6 +143,9 @@ public class Tracker extends Form {
     }
 
 
+    /**
+     * Add the text area element to the form
+     */
     private void addTextArea() {
         viewTextArea = UIComponentLibrary.createJTextArea(
             10, 42,
@@ -131,6 +159,9 @@ public class Tracker extends Form {
     }
 
 
+    /**
+     * Add the checkbox element to the form
+     */
     private void addCheckBox() {
         ActionListener showAllAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -150,8 +181,11 @@ public class Tracker extends Form {
     }
 
 
+    /**
+     * Add button elements to the form
+     */
     private void addButtons() {
-        // Find action
+        // ==== Action Listeners ====
         ActionListener findAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 String text = tfFind.getText();
@@ -203,6 +237,7 @@ public class Tracker extends Form {
         };
 
 
+        // ==== Button Elements ====
         UIComponentLibrary.createJButton(
             "Find",
             BUTTON_SIZE_WIDTH - 20,
@@ -249,6 +284,9 @@ public class Tracker extends Form {
     }
 
 
+    /**
+     * Writes the base text to the text area element
+     */
     private void updateTextViewBase() {
         LocalDate now = LocalDate.now();
 
@@ -260,6 +298,11 @@ public class Tracker extends Form {
         viewTextArea.setText(textForLargeTextArea);
     }
 
+
+    /**
+     * Clear the text area and rewrites the base message, adding a single person data to the message
+     * @param person
+     */
     public void updateTextViewPerson(final PersonData person) {
         updateTextViewBase();
 
@@ -278,6 +321,10 @@ public class Tracker extends Form {
     }
 
 
+    /**
+     * Clears the text area and rewrites the base message, writing all person data that is in thisMonth
+     * @param thisMonth
+     */
     public void updateTextViewAll(boolean thisMonth) {
         updateTextViewBase();
 

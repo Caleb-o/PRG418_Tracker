@@ -27,12 +27,20 @@ public class TrackerEdit extends Form {
         maxIndex = Tracker.instance.getDataSize();
     }
 
+    /**
+     * Run the form
+     */
+    @Override
     public void run() {
         windowFrame = this;
         setup();
         setFields();
     }
 
+
+    /**
+     * Setup the Form with GUI elements
+     */
     @Override
     protected void setup() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -67,6 +75,10 @@ public class TrackerEdit extends Form {
         this.setVisible(true);
     }
 
+
+    /**
+     * Add title label to the form
+     */
     private void addTitleLabel() {
         JLabel label = UIComponentLibrary.createJLabel(
             "Birthday Tracker Editor",
@@ -79,6 +91,10 @@ public class TrackerEdit extends Form {
         label.setForeground(Color.BLACK);
     }
 
+
+    /**
+     * Add all label elements to the form
+     */
     private void addLabels() {
         JLabel findLabel = UIComponentLibrary.createJLabel(
             "Find:    ",
@@ -137,6 +153,7 @@ public class TrackerEdit extends Form {
         );
 
 
+        // ==== Setup all label config ====
         Font currentFont = nameLabel.getFont();
 
         findLabel.setFont(new Font(nameLabel.getName(), Font.BOLD, currentFont.getSize()));
@@ -174,6 +191,10 @@ public class TrackerEdit extends Form {
         countLabel.setOpaque(true);
     }
 
+
+    /**
+     * Add all text fields to the form
+     */
     private void addTextFields() {
         tfFind = UIComponentLibrary.createJTextField(
             7,
@@ -226,6 +247,9 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Add all button elements to the form
+     */
     private void addButtons() {
         ActionListener findAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -326,6 +350,7 @@ public class TrackerEdit extends Form {
         };
 
 
+        // ==== Add buttons to form ====
         UIComponentLibrary.createJButton(
             "Find",
             BUTTON_SIZE_WIDTH,
@@ -383,6 +408,9 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Add all navigation buttons to the form
+     */
     private void addNavigationButtons() {
         ActionListener rewindAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -419,6 +447,7 @@ public class TrackerEdit extends Form {
         };
 
 
+        // ==== Add nav buttons to fomr ====
         UIComponentLibrary.createJButton(
             "<<",
             BUTTON_NAV_SIZE_WIDTH,
@@ -465,6 +494,9 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Sets text fields to person data (if one exists at current index)
+     */
     private void setFields() {
         if (maxIndex > 0) {
             countLabel.setText(String.format("%d/%d", index + 1, maxIndex));
@@ -476,6 +508,10 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Set text fields with a PersonData
+     * @param person
+     */
     private void fieldsFromPerson(final PersonData person) {
         tfName.setText(person.getName());
         tfLikes.setText(person.getLikes());
@@ -484,7 +520,11 @@ public class TrackerEdit extends Form {
         tfMonth.setText(String.format("%d", person.getFriendMonth()));
     }
 
-    
+
+    /**
+     * Create a PersonData using data from text fields
+     * @return PersonData from fields
+     */
     private PersonData personFromFields() {
         return new PersonData(
             tfName.getText(),
@@ -496,11 +536,18 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Check if any field does not have content
+     * @return whether any field is empty
+     */
     private boolean isMissingFields() {
         return tfName.getText().length() == 0 || tfLikes.getText().length() == 0 || tfDisklikes.getText().length() == 0 || tfDay.getText().length() == 0 || tfMonth.getText().length() == 0;
     }
 
 
+    /**
+     * Set all fields to an empty string or current date where relevant
+     */
     private void resetFields() {
         tfName.setText("");
         tfLikes.setText("");
@@ -510,16 +557,12 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Fetch a person with name and update its data from text fields
+     */
     private void updatePerson() {
         String personName = tfName.getText();
-        PersonData person = null;
-
-        for(PersonData per : Tracker.instance.getPersonData()) {
-            if (per.getName().equals(personName)) {
-                person = per;
-                break;
-            }
-        }
+        PersonData person = Search.getWithName(personName);
 
         // Person not found, add a new one to the list
         if (person == null) {
@@ -536,6 +579,7 @@ public class TrackerEdit extends Form {
                 options[1]
             );
 
+            // If option was Yes
             if (option == 0) {
                 Tracker.instance.getPersonData().add(personFromFields());
             }
@@ -553,6 +597,9 @@ public class TrackerEdit extends Form {
     }
 
 
+    /**
+     * Remove a PersonData from interal storage and rewrites to disk
+     */
     private void removePerson() {
         String personName = tfName.getText();
 

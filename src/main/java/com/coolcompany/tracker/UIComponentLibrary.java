@@ -8,6 +8,18 @@ import java.awt.event.KeyAdapter;
 
 public class UIComponentLibrary
 {
+    /**
+     * Creates and configures a new instance of JButton
+     * @param name
+     * @param sizeX
+     * @param sizeY
+     * @param posX
+     * @param posY
+     * @param listener
+     * @param frame
+     * @param layout
+     * @return
+     */
     public static JButton createJButton(String name,
                                         int sizeX,
                                         int sizeY,
@@ -27,8 +39,16 @@ public class UIComponentLibrary
         frame.add(button); //Adds button to frame
         return button; //Returns completed button to caller.
     }
-    
 
+    /**
+     * Creates and configures a new instance of JTextField
+     * @param size
+     * @param posX
+     * @param posY
+     * @param frame
+     * @param layout
+     * @return
+     */
     public static JTextField createJTextField(int size,
                                                int posX,
                                                int posY,
@@ -52,6 +72,16 @@ public class UIComponentLibrary
     }
 
 
+    /**
+     * Creates and configures a new instance of JTextArea
+     * @param rows
+     * @param columns
+     * @param posX
+     * @param posY
+     * @param frame
+     * @param layout
+     * @return
+     */
     public static JTextArea createJTextArea(int rows, int columns,
                                               int posX,
                                               int posY,
@@ -70,6 +100,17 @@ public class UIComponentLibrary
     }
 
 
+    /**
+     * Creates and configures a new instance of JCheckBox
+     * @param text
+     * @param posX
+     * @param posY
+     * @param selected
+     * @param listener
+     * @param frame
+     * @param layout
+     * @return
+     */
     public static JCheckBox createJCheckBox(String text,
                                             int posX,
                                             int posY,
@@ -88,7 +129,15 @@ public class UIComponentLibrary
         return checkBox;
     }
 
-
+    /**
+     * Creates and configures a new instance of JLabel
+     * @param text
+     * @param posX
+     * @param posY
+     * @param frame
+     * @param layout
+     * @return
+     */
     public static JLabel createJLabel(String text,
                                        int posX,
                                        int posY,
