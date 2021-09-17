@@ -100,7 +100,7 @@ public class UIComponentLibrary
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         );
         
-        layout.putConstraint(SpringLayout.WEST, scrollPane, 0, SpringLayout.WEST, frame);//Sets text field's X Coordinates
+        layout.putConstraint(SpringLayout.WEST, scrollPane, posX, SpringLayout.WEST, frame);//Sets text field's X Coordinates
         layout.putConstraint(SpringLayout.NORTH, scrollPane, posY, SpringLayout.NORTH, frame);//Sets text field's Y Coordinates
         
         frame.add(scrollPane);

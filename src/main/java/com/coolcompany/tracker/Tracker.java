@@ -148,7 +148,7 @@ public class Tracker extends Form {
      */
     private void addTextArea() {
         viewTextArea = UIComponentLibrary.createJTextArea(
-            10, 42,
+            10, 40,
             WINDOW_COLUMN_ONE_X,
             35,
             this,
