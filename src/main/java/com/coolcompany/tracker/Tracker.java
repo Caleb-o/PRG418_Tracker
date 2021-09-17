@@ -194,7 +194,7 @@ public class Tracker extends Form {
             "Search",
             BUTTON_SIZE_WIDTH - 20,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_ONE_X + (10 + BUTTON_SIZE_WIDTH) * 2 - 20,
+            WINDOW_COLUMN_ONE_X + (10 + BUTTON_SIZE_WIDTH) * 2 - 10,
             WINDOW_SIZE_HEIGHT - 64,
             searchAction,
             this,
@@ -203,9 +203,9 @@ public class Tracker extends Form {
 
         UIComponentLibrary.createJButton(
             "Reset",
-            BUTTON_SIZE_WIDTH - 20,
+            BUTTON_SIZE_WIDTH,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_THREE_X + 40,
+            WINDOW_COLUMN_THREE_X + 30,
             10,
             resetAction,
             this,
@@ -214,9 +214,9 @@ public class Tracker extends Form {
 
         UIComponentLibrary.createJButton(
             "Edit",
-            BUTTON_SIZE_WIDTH - 10,
+            BUTTON_SIZE_WIDTH,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_THREE_X + 40,
+            WINDOW_COLUMN_THREE_X + 30,
             WINDOW_SIZE_HEIGHT - 64,
             editAction,
             this,

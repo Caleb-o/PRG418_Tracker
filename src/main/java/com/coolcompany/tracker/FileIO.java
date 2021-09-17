@@ -3,9 +3,12 @@ package com.coolcompany.tracker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
 
 public final class FileIO {
 
@@ -20,11 +23,24 @@ public final class FileIO {
         try {
             File file = new File("friend_data.csv");
             Scanner reader = new Scanner(file);
+            int failCount = 0;
 
             // Read each line
             while(reader.hasNextLine()) {
-                pdata.add(new PersonData(reader.nextLine().split(", ")));
+                String[] data = reader.nextLine().split(", ");
+                
+                // Check if correct amount of items were read
+                if (Array.getLength(data) == 5) {
+                    pdata.add(new PersonData(data));
+                } else {
+                    failCount++;
+                }
             }
+            
+            if (failCount > 0) {
+                JOptionPane.showMessageDialog(null, String.format("%d entries failed to be read.", failCount), "Read Error", JOptionPane.ERROR_MESSAGE);
+            }
+
             reader.close();
 
         } catch (IOException e) {
