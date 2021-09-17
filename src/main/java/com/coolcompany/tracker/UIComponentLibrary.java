@@ -91,11 +91,20 @@ public class UIComponentLibrary
         JTextArea textArea = new JTextArea(rows, columns); //Creates JTextField and sets size
         textArea.setEditable(false);
         textArea.setMaximumSize(new Dimension(rows, columns));
+        textArea.setLineWrap(true);
 
-        layout.putConstraint(SpringLayout.WEST, textArea, posX, SpringLayout.WEST, frame);//Sets text field's X Coordinates
-        layout.putConstraint(SpringLayout.NORTH, textArea, posY, SpringLayout.NORTH, frame);//Sets text field's Y Coordinates
+        // Add a scroll bar to text area
+        JScrollPane scrollPane = new JScrollPane(
+            textArea, 
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
+        
+        layout.putConstraint(SpringLayout.WEST, scrollPane, 0, SpringLayout.WEST, frame);//Sets text field's X Coordinates
+        layout.putConstraint(SpringLayout.NORTH, scrollPane, posY, SpringLayout.NORTH, frame);//Sets text field's Y Coordinates
+        
+        frame.add(scrollPane);
 
-        frame.add(textArea); //Adds text field to frame
         return textArea; //Returns completed text field to caller
     }
 

@@ -45,12 +45,12 @@ public class Tracker extends Form {
         pdata = FileIO.read();
 
         // add GUI objects
-        addTitleLabel();
         
         addCheckBox();
+        addTextArea();
         addTextFields();
         addButtons();
-        addTextArea();
+        addTitleLabel();
 
         // apply layout to Form
         Container contentPane = this.getContentPane();
@@ -150,7 +150,7 @@ public class Tracker extends Form {
         viewTextArea = UIComponentLibrary.createJTextArea(
             10, 42,
             WINDOW_COLUMN_ONE_X,
-            32,
+            35,
             this,
             layout
         );
