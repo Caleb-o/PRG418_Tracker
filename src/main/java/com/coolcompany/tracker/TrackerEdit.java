@@ -303,8 +303,15 @@ public class TrackerEdit extends Form {
                     JOptionPane.showMessageDialog(null, "All fields are required to create an entry", "Creation Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
-                PersonData person = personFromFields();
+                
+                PersonData person = null;
+                
+                try {
+                    person = personFromFields();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "A field was not correct! Day and month require numbers and not words or letters.", "Creation Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 // Check for existing entry
                 if (Search.getWithName(person.getName()) != null) {
