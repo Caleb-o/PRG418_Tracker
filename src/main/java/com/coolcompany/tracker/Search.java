@@ -23,6 +23,24 @@ public class Search {
 
 
     /**
+     * @param day
+     * @param month
+     * @return every person with a birthday on the day and month
+     */
+    public static List<PersonData> getPersonDayMonth(int day, int month) {
+        List<PersonData> personMonth = new ArrayList<PersonData>();
+
+        for(PersonData person : Tracker.instance.getPersonData()) {
+            if (person.getFriendDay() == day && person.getFriendMonth() == month) {
+                personMonth.add(person);
+            }
+        }
+
+        return personMonth;
+    }
+
+
+    /**
      * @param name
      * @return person with name
      */
@@ -46,6 +64,11 @@ public class Search {
 		Tracker.instance.getPersonData().toArray(pdata);
 
 		Arrays.sort(pdata);
+
+        // For debugging purposes, to check for sorted names
+        for(PersonData person : pdata) {
+            System.out.println(person.getName());
+        }
 
 		int index = Arrays.binarySearch(pdata, name);
 		return pdata[index];

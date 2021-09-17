@@ -71,7 +71,7 @@ public class TrackerEdit extends Form {
         JLabel label = UIComponentLibrary.createJLabel(
             "Birthday Tracker Editor",
             WINDOW_COLUMN_ONE_X,
-            10,
+            5,
             this,
             layout
         );

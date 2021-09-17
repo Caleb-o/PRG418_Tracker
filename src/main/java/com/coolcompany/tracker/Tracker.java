@@ -61,6 +61,25 @@ public class Tracker extends Form {
         this.setPreferredSize(new Dimension(WINDOW_SIZE_WIDTH, WINDOW_SIZE_HEIGHT));
         this.pack();
         this.setVisible(true);
+
+        // Check for birthdays today
+        List<PersonData> today = Search.getPersonDayMonth(LocalDate.now().getDayOfMonth(), LocalDate.now().getMonthValue());
+
+        // There are birthdays today!
+        if (today.size() > 0) {
+            String names = "";
+
+            for(int i = 0; i < today.size(); i++) {
+                names += today.get(i).getName();
+
+                if (i < today.size() - 1) {
+                    names += ", ";
+                }
+            }
+
+            // Present to user
+            JOptionPane.showMessageDialog(null, String.format("\"%s\" have birthdays today!", names), "Birthdays Today!", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     public List<PersonData> getPersonData() {
@@ -75,7 +94,7 @@ public class Tracker extends Form {
         JLabel label = UIComponentLibrary.createJLabel(
             "Birthday Tracker",
             WINDOW_COLUMN_ONE_X,
-            10,
+            5,
             this,
             layout
         );
@@ -166,7 +185,7 @@ public class Tracker extends Form {
             }
         };
 
-        ActionListener resetAction = new ActionListener() {
+        ActionListener refreshAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 updateTextViewAll(true);
             }
@@ -202,12 +221,12 @@ public class Tracker extends Form {
         );
 
         UIComponentLibrary.createJButton(
-            "Reset",
-            BUTTON_SIZE_WIDTH,
+            "Refresh",
+            BUTTON_SIZE_WIDTH - 10,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_THREE_X + 30,
+            WINDOW_COLUMN_THREE_X + 40,
             10,
-            resetAction,
+            refreshAction,
             this,
             layout
         );
@@ -261,6 +280,8 @@ public class Tracker extends Form {
 
         List<PersonData> people;
 
+        // Check if we have set for entries this month to be viewed
+        // It is overridden if the Show All option is selected
         if (thisMonth && !chkShowAll.isSelected()) {
             people = Search.getPersonMonth(LocalDate.now().getMonthValue());
         } else {

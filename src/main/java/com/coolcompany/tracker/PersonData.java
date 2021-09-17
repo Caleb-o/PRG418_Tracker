@@ -1,6 +1,5 @@
 package com.coolcompany.tracker;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 
 public class PersonData implements Comparable<Object> {
