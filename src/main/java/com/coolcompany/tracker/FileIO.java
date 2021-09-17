@@ -28,10 +28,18 @@ public final class FileIO {
             // Read each line
             while(reader.hasNextLine()) {
                 String[] data = reader.nextLine().split(", ");
-                
+
+                for(String str : data) {
+                    str.trim();
+                }
+
                 // Check if correct amount of items were read
                 if (Array.getLength(data) == 5) {
-                    pdata.add(new PersonData(data));
+                    try {
+                        pdata.add(new PersonData(data));
+                    } catch (Exception e) {
+                        failCount++;
+                    }
                 } else {
                     failCount++;
                 }

@@ -286,6 +286,9 @@ public class TrackerEdit extends Form {
                 updatePerson();
 
                 maxIndex = Tracker.instance.getDataSize();
+                index = maxIndex - 1;
+             
+                setFields();
             }
         };
 
@@ -512,8 +515,6 @@ public class TrackerEdit extends Form {
         PersonData person = null;
 
         for(PersonData per : Tracker.instance.getPersonData()) {
-            System.out.println(per.getName() + " == " + personName + " = " + (per.getName() == personName));
-
             if (per.getName().equals(personName)) {
                 person = per;
                 break;

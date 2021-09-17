@@ -69,16 +69,21 @@ public class Tracker extends Form {
         if (today.size() > 0) {
             String names = "";
 
-            for(int i = 0; i < today.size(); i++) {
+            int maxSize = today.size();
+
+            for(int i = 0; i < maxSize; i++) {
                 names += today.get(i).getName();
 
-                if (i < today.size() - 1) {
+                // Better formatting for many members
+                if (i < maxSize - 2) {
                     names += ", ";
+                } else if (maxSize > 1 && i == maxSize - 2) {
+                    names += " and ";
                 }
             }
 
             // Present to user
-            JOptionPane.showMessageDialog(null, String.format("\"%s\" have birthdays today!", names), "Birthdays Today!", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, String.format("\"%s\" have their birthday today!", names), "Birthday Today!", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
