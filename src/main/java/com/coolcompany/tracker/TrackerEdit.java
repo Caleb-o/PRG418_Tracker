@@ -270,6 +270,27 @@ public class TrackerEdit extends Form {
             }
         };
 
+        ActionListener searchAction = new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                String text = tfFind.getText();
+
+                if (text.length() == 0) {
+                    return;
+                }
+
+                PersonData person = Search.getWithNameBinary(text);
+
+                if (person == null) {
+                    JOptionPane.showMessageDialog(null, String.format("Could not find anyone with name: \"%s\"", text), "Search Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                fieldsFromPerson(person);
+            }
+        };
+
+
+
         ActionListener newAction = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 resetFields();
@@ -284,6 +305,13 @@ public class TrackerEdit extends Form {
                 }
 
                 PersonData person = personFromFields();
+
+                // Check for existing entry
+                if (Search.getWithName(person.getName()) != null) {
+                    JOptionPane.showMessageDialog(null, "An entry with this name already exists!", "Creation Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 Tracker.instance.getPersonData().add(person);
 
                 FileIO.create(person);
@@ -353,11 +381,22 @@ public class TrackerEdit extends Form {
         // ==== Add buttons to form ====
         UIComponentLibrary.createJButton(
             "Find",
-            BUTTON_SIZE_WIDTH,
+            BUTTON_SIZE_WIDTH - 20,
             BUTTON_SIZE_HEIGHT,
-            WINDOW_COLUMN_TWO_X - 24,
+            WINDOW_COLUMN_ONE_X + (20 + BUTTON_SIZE_WIDTH),
             WINDOW_SIZE_HEIGHT - 64,
             findAction,
+            this,
+            layout
+        );
+
+        UIComponentLibrary.createJButton(
+            "Search",
+            BUTTON_SIZE_WIDTH - 20,
+            BUTTON_SIZE_HEIGHT,
+            WINDOW_COLUMN_ONE_X + (10 + BUTTON_SIZE_WIDTH) * 2 - 10,
+            WINDOW_SIZE_HEIGHT - 64,
+            searchAction,
             this,
             layout
         );
